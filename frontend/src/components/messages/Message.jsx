@@ -1,19 +1,41 @@
-const Message = () => {
+import { useSelector } from "react-redux";
+import { extractTime } from "../../utils/extractTime";
+
+const Message = ({ message }) => {
+  const userMe = useSelector((state) => state.user);
+  const selectedConversation = useSelector(
+    (state) => state?.conversation?.selectedConversation
+  );
+  console.log(selectedConversation, "selectedConversation");
+  console.log(message, "message");
+
+  const fromMe = message.senderId === userMe?._id;
+
+  
+  const formattedTime = extractTime(message.createdAt);
+  const chatClassName = fromMe ? "chat-end" : "chat-start";
+  console.log(fromMe, "fromMe");
+
+  const profilePic = fromMe
+    ? userMe.profilePic
+    : selectedConversation?.profilePic;
+  const bubbleBgColor = fromMe ? "bg-teal-500" : "";
+
+  const shakeClass = message.shouldShake ? "shake" : "";
   return (
-    <div className="chat chat-end">
+    <div className={`chat ${chatClassName}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
-          <img
-            src="https://avatar.iran.liara.run/public/boy"
-            alt="user avatar"
-          />
+          <img alt="Tailwind CSS chat bubble component" src={profilePic} />
         </div>
       </div>
-      <div className={`chat-bubble text-white bg-blue-500`}>
-        Hi! What is upp?
+      <div
+        className={`chat-bubble text-white ${bubbleBgColor} ${shakeClass} pb-2`}
+      >
+        {message.message}
       </div>
-      <div className="chat-footer opacity-70 text-black text-xs flex gap-1 items-center">
-        12:48
+      <div className="chat-footer opacity-50 text-black text-xs flex gap-1 items-center">
+        {formattedTime}
       </div>
     </div>
   );
