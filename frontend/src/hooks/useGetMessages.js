@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessages } from "../redux/features/conversationSlice";
 
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false);
-  const [messagesData, setMessagesData] = useState([]);
+  const dispatch = useDispatch();
   const selectedConversation = useSelector(
     (state) => state?.conversation?.selectedConversation
   );
+  const messages = useSelector((state) => state.conversation.messages);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -22,7 +24,7 @@ const useGetMessages = () => {
         if (data.error) {
           throw new Error(data.error);
         } else {
-          setMessagesData(data);
+      dispatch(setMessages(data))
         }
       } catch (error) {
         toast.error(error.message);
@@ -32,9 +34,9 @@ const useGetMessages = () => {
     };
 
     if (selectedConversation?._id) getMessages();
-  }, [selectedConversation?._id, setMessagesData]);
+  }, [selectedConversation?._id, setMessages]);
 
-  return { loading, messagesData };
+  return { loading, messages };
 };
 
 export default useGetMessages;

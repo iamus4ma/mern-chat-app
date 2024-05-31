@@ -6,15 +6,11 @@ const Message = ({ message }) => {
   const selectedConversation = useSelector(
     (state) => state?.conversation?.selectedConversation
   );
-  console.log(selectedConversation, "selectedConversation");
-  console.log(message, "message");
 
   const fromMe = message.senderId === userMe?._id;
 
-  
   const formattedTime = extractTime(message.createdAt);
   const chatClassName = fromMe ? "chat-end" : "chat-start";
-  console.log(fromMe, "fromMe");
 
   const profilePic = fromMe
     ? userMe.profilePic
