@@ -11,18 +11,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-w-96 mx-auto">
-      <div className="w-full p-6 rounded-lg shadow-md bg-gray-900 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-15">
+    <div className="flex flex-col items-center justify-center w-full max-w-sm mx-auto px-4">
+      <div className="w-full p-6 rounded-lg shadow-md bg-slate-900/55 backdrop-blur-lg">
         <img src="/chatkro.svg" alt="ChatKro" className="w-14 h-14 mx-auto mb-3" />
-        <h1 className="text-3xl font-semibold text-center text-gray-300">
+        <h1 className="text-3xl font-semibold text-center text-white">
           Login
-          <span className="text-indigo-800"> ChatKro</span>
+          <span className="text-teal-300"> ChatKro</span>
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label className="label p-2">
-              <span className="text-base label-text ">Username*</span>
+              <span className="text-base text-slate-100">Username*</span>
             </label>
             <Controller
               name="username"
@@ -33,7 +33,7 @@ const Login = () => {
                   {...field}
                   type="text"
                   placeholder="Enter username here . . ."
-                  className="w-full input input-bordered h-10"
+                  className="w-full input h-10 bg-slate-800 border-slate-500 text-white placeholder:text-slate-400"
                 />
               )}
             />
@@ -41,7 +41,7 @@ const Login = () => {
 
           <div>
             <label className="label">
-              <span className="text-base label-text">Password*</span>
+              <span className="text-base text-slate-100">Password*</span>
             </label>
             <Controller
               name="password"
@@ -52,7 +52,7 @@ const Login = () => {
                   {...field}
                   type="password"
                   placeholder="Enter Password here . . ."
-                  className="w-full input input-bordered h-10"
+                  className="w-full input h-10 bg-slate-800 border-slate-500 text-white placeholder:text-slate-400"
                 />
               )}
             />
@@ -60,7 +60,7 @@ const Login = () => {
 
           <Link
             to="/signup"
-            className="text-sm  hover:underline hover:text-blue-600 mt-2 inline-block"
+            className="text-sm text-teal-200 hover:underline hover:text-teal-100 mt-2 inline-block"
           >
             {"Don't"} have an account?
           </Link>
@@ -71,7 +71,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-block btn-sm mt-2"
+              className="btn btn-block btn-sm mt-2 bg-teal-700 hover:bg-teal-600 border-0 text-white"
             >
               {loading ? (
                 <span className="loading loading-spinner"></span>

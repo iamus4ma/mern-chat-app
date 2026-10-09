@@ -6,6 +6,7 @@ const Conversations = ({ loading, conversationsData }) => {
   }
   return (
     <div className="py-2 flex flex-col overflow-auto">
+      {conversationsData.length === 0 && <p className="text-sm text-gray-300 px-2">No conversations yet. Search for someone to start one.</p>}
       {conversationsData?.map((conversation, index) => (
         <SingleConversation
           key={conversation._id}

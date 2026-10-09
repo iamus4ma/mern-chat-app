@@ -3,6 +3,7 @@ import http from "http";
 import express from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -36,6 +37,10 @@ io.on("connection", (socket) => {
 	socket.join(userId);
 	if (!userSocketMap.has(userId)) userSocketMap.set(userId, new Set());
 	userSocketMap.get(userId).add(socket.id);
+	socket.on("typing", ({ receiverId, isTyping } = {}) => {
+		if (!mongoose.isValidObjectId(receiverId) || receiverId === userId || typeof isTyping !== "boolean") return;
+		socket.to(receiverId).emit("typing", { senderId: userId, isTyping });
+	});
 	const expiry = setTimeout(() => socket.disconnect(true), Math.max(0, socket.data.expiresAt - Date.now()));
 	expiry.unref();
 

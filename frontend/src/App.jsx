@@ -32,12 +32,12 @@ function App() {
   if (authStatus === "unavailable") return (
     <div role="alert" className="text-center text-white">
       <p>Cannot reach the server to check your session.</p>
-      <button className="btn mt-3" onClick={() => setAttempt((value) => value + 1)}>Retry</button>
+      <button className="btn mt-3 bg-teal-700 hover:bg-teal-600 border-0 text-white" onClick={() => setAttempt((value) => value + 1)}>Retry</button>
     </div>
   );
 
   return (
-    <div className="p-4 h-screen flex items-center justify-center">
+    <div className="sm:p-4 h-[100dvh] flex items-center justify-center">
       <Routes>
         <Route
           path="/"
