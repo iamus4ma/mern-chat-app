@@ -7,8 +7,7 @@ const MessageInput = () => {
   const { loading, sendmessage } = useSendMessage();
   const onSubmit = async (data) => {
     if (!data) return;
-    await sendmessage(data);
-    reset();
+    if (await sendmessage(data)) reset();
   };
 
   return (
@@ -22,6 +21,7 @@ const MessageInput = () => {
         />
         <button
           type="submit"
+          disabled={loading}
           className="absolute inset-y-0 end-0 flex items-center pe-3"
         >
           {loading ? (

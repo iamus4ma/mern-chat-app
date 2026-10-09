@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/userSlice";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
 
   const login = async ({ username, password }) => {
-    const success = handleInputErrors({
-      username,
-      password,
-    });
-    if (!success) return;
+    setError("");
+    if (typeof username !== "string" || !username.trim() || !password) {
+      setError("Please enter your username and password.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -24,29 +24,18 @@ const useLogin = () => {
           password,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (data.error) {
-        throw new Error(data.error);
-      } else {
-        dispatch(setUser(data));
-      }
+      if (!res.ok) throw new Error(data?.error || "Unable to sign in. Please try again.");
+      if (!data?._id) throw new Error("Unable to sign in. Please try again.");
+      dispatch(setUser(data));
     } catch (error) {
-      toast.error(error.message);
+      setError(error instanceof TypeError ? "Cannot reach the server. Please try again." : error.message);
     } finally {
       setLoading(false);
     }
   };
-  return { loading, login };
+  return { loading, error, login };
 };
 
 export default useLogin;
-
-function handleInputErrors({ username, password }) {
-  if (!username || !password) {
-    toast.error("Please fill in all fields");
-    return false;
-  }
-
-  return true;
-}

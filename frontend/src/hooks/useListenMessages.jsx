@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSocketContext } from "../context/SocketContext";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessages } from "../redux/features/conversationSlice";
+import { mergeMessages } from "../redux/features/conversationSlice";
 import notificationSound from "../assets/sounds/notification.mp3";
 
 const useListenMessages = () => {
   const { socket } = useSocketContext();
   const dispatch = useDispatch();
-  const messages = useSelector((state) => state.conversation.messages);
+  const conversationId = useSelector((state) => state.conversation.selectedConversation?._id);
   useEffect(() => {
-    socket?.on("newMessage", (newMessage) => {
-      newMessage.shouldShake = true;
-      const sound = new Audio(notificationSound);
-      sound.play();
-      dispatch(setMessages([...messages, newMessage]));
-    });
-
-    return () => socket?.off("newMessage");
-  }, [socket, dispatch, messages]);
+    if (!socket || !conversationId) return;
+    const onMessage = (newMessage) => {
+      if (newMessage.senderId !== conversationId) return;
+      dispatch(mergeMessages({ conversationId, messages: [{ ...newMessage, shouldShake: true }] }));
+      new Audio(notificationSound).play().catch(() => {});
+    };
+    socket.on("newMessage", onMessage);
+    return () => socket.off("newMessage", onMessage);
+  }, [socket, dispatch, conversationId]);
 };
 
 export default useListenMessages;

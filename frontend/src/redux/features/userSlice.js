@@ -1,13 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const storedUser = JSON.parse(localStorage.getItem("user"));
-
 const initialState = {
-  _id: storedUser ? storedUser._id : "",
-  fullName: storedUser ? storedUser.fullName : "",
-  username: storedUser ? storedUser.username : "",
-  profilePic: storedUser ? storedUser.profilePic : "",
-  isAuthenticated: localStorage.getItem("isAuthenticated") === "true",
+  _id: "",
+  fullName: "",
+  username: "",
+  profilePic: "",
+  isAuthenticated: false,
+  authChecked: false,
 };
 
 export const userSlice = createSlice({
@@ -16,22 +15,12 @@ export const userSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       const { _id, fullName, username, profilePic } = action.payload;
-      const isAuthenticated =
-        fullName !== "" && username !== "" && profilePic !== "";
-
-      // Update state
       state._id = _id;
       state.fullName = fullName;
       state.username = username;
       state.profilePic = profilePic;
-      state.isAuthenticated = isAuthenticated;
-
-      // Update localStorage
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ _id, fullName, username, profilePic })
-      );
-      localStorage.setItem("isAuthenticated", isAuthenticated);
+      state.isAuthenticated = true;
+      state.authChecked = true;
     },
     logoutUser: (state) => {
       state._id = "";
@@ -39,12 +28,14 @@ export const userSlice = createSlice({
       state.username = "";
       state.profilePic = "";
       state.isAuthenticated = false;
-      localStorage.removeItem("user");
-      localStorage.removeItem("isAuthenticated");
+      state.authChecked = true;
+    },
+    finishAuthCheck: (state) => {
+      state.authChecked = true;
     },
   },
 });
 
-export const { setUser, logoutUser } = userSlice.actions;
+export const { setUser, logoutUser, finishAuthCheck } = userSlice.actions;
 
 export default userSlice.reducer;

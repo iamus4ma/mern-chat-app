@@ -1,43 +1,41 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { useSelector } from "react-redux";
-// import { useAuthContext } from "./AuthContext";
+import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
+import { logoutUser } from "../redux/features/userSlice";
 
 const SocketContext = createContext();
 
-export const useSocketContext = () => {
-	return useContext(SocketContext);
-};
+export const useSocketContext = () => useContext(SocketContext);
 
 export const SocketContextProvider = ({ children }) => {
-	const [socket, setSocket] = useState(null);
-	const [onlineUsers, setOnlineUsers] = useState([]);
-  const authUser = useSelector((state) => state.user);
-	// const { authUser } = useAuthContext();
+  const [socket, setSocket] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const userId = useSelector((state) => state.user._id);
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  const dispatch = useDispatch();
 
-	useEffect(() => {
-		if (authUser) {
-			const socket = io("https://chat-kro.onrender.com", {
-				query: {
-					userId: authUser._id,
-				},
-			});
+  useEffect(() => {
+    if (!isAuthenticated || !userId) {
+      setSocket(null);
+      setOnlineUsers([]);
+      return;
+    }
 
-			setSocket(socket);
+    const connection = io();
+    connection.on("getOnlineUsers", setOnlineUsers);
+    connection.on("connect_error", (error) => {
+      if (error.message === "Unauthorized") dispatch(logoutUser());
+    });
+    connection.on("disconnect", (reason) => {
+      if (reason === "io server disconnect") dispatch(logoutUser());
+    });
+    setSocket(connection);
 
-			// socket.on() is used to listen to the events. can be used both on client and server side
-			socket.on("getOnlineUsers", (users) => {
-				setOnlineUsers(users);
-			});
+    return () => {
+      connection.disconnect();
+      setOnlineUsers([]);
+    };
+  }, [isAuthenticated, userId, dispatch]);
 
-			return () => socket.close();
-		} else {
-			if (socket) {
-				socket.close();
-				setSocket(null);
-			}
-		}
-	}, [authUser]);
-
-	return <SocketContext.Provider value={{ socket, onlineUsers }}>{children}</SocketContext.Provider>;
+  return <SocketContext.Provider value={{ socket, onlineUsers }}>{children}</SocketContext.Provider>;
 };

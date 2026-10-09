@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
+    "test": "node --test backend/socket/socket.test.js frontend/src/redux/features/conversationSlice.test.js",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "type": "module",

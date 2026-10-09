@@ -1,11 +1,8 @@
 import React from "react";
 import SingleConversation from "./SingleConversation";
-import useGetConversations from "../../hooks/useGetConversations";
 import { getRandomEmoji } from "../../utils/emojis";
 
-const Conversations = () => {
-  const { loading, conversationsData } = useGetConversations();
-
+const Conversations = ({ loading, conversationsData }) => {
   if (loading) {
     return <span className="loading loading-spinner mx-auto"></span>;
   }

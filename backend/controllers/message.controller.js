@@ -1,12 +1,22 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
-import { getReceiverSocketId, io } from "../socket/socket.js";
+import { io } from "../socket/socket.js";
+import mongoose from "mongoose";
+import User from "../models/user.model.js";
 
 export const sendMessage = async (req, res) => {
   try {
     const { id: receiverId } = req.params;
     const { message } = req.body;
     const senderId = req.user._id;
+
+    if (!mongoose.isValidObjectId(receiverId) || String(senderId) === receiverId ||
+        typeof message !== "string" || !message.trim() || message.length > 5000) {
+      return res.status(400).json({ error: "Invalid message or recipient" });
+    }
+    if (!(await User.exists({ _id: receiverId }))) {
+      return res.status(404).json({ error: "Recipient not found" });
+    }
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] },
@@ -17,25 +27,20 @@ export const sendMessage = async (req, res) => {
         participants: [senderId, receiverId],
       });
     }
-    const newMessage = new Message({ senderId, receiverId, message });
+    const newMessage = new Message({ senderId, receiverId, message: message.trim() });
 
-    if (newMessage) {
-      conversation.messages.push(newMessage._id);
+    await newMessage.save();
+    try {
+      await Conversation.updateOne(
+        { _id: conversation._id },
+        { $addToSet: { messages: newMessage._id } }
+      );
+    } catch (error) {
+      await newMessage.deleteOne();
+      throw error;
     }
 
-    // await conversation.save();
-    // await newMessage.save();
-
-    // this will run parallel
-    await Promise.all([conversation.save(), newMessage.save()]);
-
-    // SOCKET IO functionality
-
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverSocketId) {
-      // io.to(<socket_id>).emit() used to send events to specific client
-      io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
+    io.to(receiverId).emit("newMessage", newMessage);
 
     res.status(201).json(newMessage);
   } catch (error) {
@@ -48,6 +53,10 @@ export const getMessages = async (req, res) => {
   try {
     const { id: userToChatId } = req.params;
     const senderId = req.user._id;
+
+    if (!mongoose.isValidObjectId(userToChatId) || String(senderId) === userToChatId) {
+      return res.status(400).json({ error: "Invalid recipient" });
+    }
 
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, userToChatId] },

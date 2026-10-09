@@ -1,15 +1,22 @@
-create .env file
+# ChatKro
 
-add MONGO_DB_URI & JWT_SECRET
+Create a `.env` file in the project root with `MONGO_DB_URI` and `JWT_SECRET`.
 
-<!-- run the below commands -->
-cd frontend
-npm i
+Install dependencies from the project root and start the API:
+
+```sh
+npm install
 npm run dev
+```
 
-<!-- ////// -->
+In another terminal, start the frontend:
 
-cd to backend
+```sh
+cd frontend
+npm install
+npm run dev
+```
 
-npm i
-node server.js
+The Vite development server runs on port 3000 and proxies `/api` and `/socket.io` to the API on port 8000. The production server serves the built frontend from `frontend/dist`; build it with `npm run build` from the project root.
+
+Run the focused tests with `npm test` after installing both sets of dependencies.

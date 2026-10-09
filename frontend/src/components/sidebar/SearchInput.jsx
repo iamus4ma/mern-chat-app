@@ -2,13 +2,11 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { IoSearchSharp } from "react-icons/io5";
-import useGetConversations from "../../hooks/useGetConversations";
 import { setSelectedConversation } from "../../redux/features/conversationSlice";
 import { useDispatch } from "react-redux";
 
-const SearchInput = () => {
+const SearchInput = ({ loading, conversationsData }) => {
   const dispatch = useDispatch();
-  const { loading, conversationsData, error } = useGetConversations();
 
   const { register, handleSubmit, reset } = useForm();
 
@@ -42,7 +40,6 @@ const SearchInput = () => {
       <button type="submit" className="btn btn-circle bg-teal-500 text-white" disabled={loading}>
         {loading ? "Searching..." : <IoSearchSharp className="w-6 h-6 outline-none" />}
       </button>
-      {error && <span className="text-red-500">{error.message}</span>}
     </form>
   );
 };

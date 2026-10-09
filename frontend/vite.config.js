@@ -8,7 +8,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "https://chat-kro.onrender.com",
+        target: "http://localhost:8000",
+      },
+      "/socket.io": {
+        target: "http://localhost:8000",
+        ws: true,
       },
     },
   },

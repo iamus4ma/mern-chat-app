@@ -4,7 +4,7 @@ import useLogin from "../../hooks/useLogin";
 
 const Login = () => {
   const { control, handleSubmit } = useForm();
-  const { loading, login } = useLogin();
+  const { loading, error, login } = useLogin();
 
   const onSubmit = async (data) => {
     await login(data);
@@ -63,6 +63,8 @@ const Login = () => {
           >
             {"Don't"} have an account?
           </Link>
+
+          {error && <p role="alert" className="mt-2 text-sm text-red-300">{error}</p>}
 
           <div>
             <button
