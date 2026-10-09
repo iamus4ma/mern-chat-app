@@ -20,3 +20,5 @@ npm run dev
 The Vite development server runs on port 3000 and proxies `/api` and `/socket.io` to the API on port 8000. The production server serves the built frontend from `frontend/dist`; build it with `npm run build` from the project root.
 
 Run the focused tests with `npm test` after installing both sets of dependencies.
+
+On startup, the API connects to MongoDB and creates the indexes used for unique conversations, message retries, and authentication attempt limits. Login allows 20 attempts per IP every 15 minutes; signup allows 5 per IP every hour.

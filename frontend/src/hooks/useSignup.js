@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/userSlice";
+import { apiRequest } from "../utils/apiRequest";
 
 const useSignup = () => {
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ const useSignup = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
+      const data = await apiRequest("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -36,13 +37,7 @@ const useSignup = () => {
           gender,
         }),
       });
-      const data = await res.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      } else {
-        dispatch(setUser(data));
-      }
+      dispatch(setUser(data));
     } catch (error) {
       toast.error(error.message);
     } finally {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/userSlice";
+import { apiRequest } from "../utils/apiRequest";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ const useLogin = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const data = await apiRequest("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -24,13 +25,10 @@ const useLogin = () => {
           password,
         }),
       });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) throw new Error(data?.error || "Unable to sign in. Please try again.");
       if (!data?._id) throw new Error("Unable to sign in. Please try again.");
       dispatch(setUser(data));
     } catch (error) {
-      setError(error instanceof TypeError ? "Cannot reach the server. Please try again." : error.message);
+      setError(error.message);
     } finally {
       setLoading(false);
     }

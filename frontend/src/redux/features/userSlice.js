@@ -6,7 +6,7 @@ const initialState = {
   username: "",
   profilePic: "",
   isAuthenticated: false,
-  authChecked: false,
+  authStatus: "checking",
 };
 
 export const userSlice = createSlice({
@@ -20,7 +20,7 @@ export const userSlice = createSlice({
       state.username = username;
       state.profilePic = profilePic;
       state.isAuthenticated = true;
-      state.authChecked = true;
+      state.authStatus = "authenticated";
     },
     logoutUser: (state) => {
       state._id = "";
@@ -28,14 +28,17 @@ export const userSlice = createSlice({
       state.username = "";
       state.profilePic = "";
       state.isAuthenticated = false;
-      state.authChecked = true;
+      state.authStatus = "unauthenticated";
     },
-    finishAuthCheck: (state) => {
-      state.authChecked = true;
+    startAuthCheck: (state) => {
+      state.authStatus = "checking";
+    },
+    setAuthUnavailable: (state) => {
+      state.authStatus = "unavailable";
     },
   },
 });
 
-export const { setUser, logoutUser, finishAuthCheck } = userSlice.actions;
+export const { setUser, logoutUser, startAuthCheck, setAuthUnavailable } = userSlice.actions;
 
 export default userSlice.reducer;

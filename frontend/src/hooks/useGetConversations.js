@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/features/userSlice";
+import { apiRequest } from "../utils/apiRequest";
 
 const useGetConversations = () => {
   const [loading, setLoading] = useState(false);
@@ -14,24 +15,13 @@ const useGetConversations = () => {
       setLoading(true);
 
       try {
-        const res = await fetch("/api/users", {
-          method: "GET",
+        const data = await apiRequest("/api/users", {
           signal: controller.signal,
+          onUnauthorized: () => dispatch(logoutUser()),
         });
-        const data = await res.json();
-
-        if (res.status === 401) {
-          dispatch(logoutUser());
-          return;
-        }
-
-        if (data.error) {
-          throw new Error(data.error);
-        } else {
-          setConversationsData(data);
-        }
+        setConversationsData(data);
       } catch (error) {
-        if (error.name !== "AbortError") toast.error(error.message);
+        if (error.name !== "AbortError" && error.status !== 401) toast.error(error.message);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }

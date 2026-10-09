@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { mergeMessages } from "../redux/features/conversationSlice";
 import { logoutUser } from "../redux/features/userSlice";
+import { apiRequest } from "../utils/apiRequest";
 
 const useGetMessages = () => {
   const [loading, setLoading] = useState(false);
@@ -17,23 +18,13 @@ const useGetMessages = () => {
       setLoading(true);
 
       try {
-        const res = await fetch(`/api/messages/${conversationId}`, {
+        const data = await apiRequest(`/api/messages/${conversationId}`, {
           signal: controller.signal,
+          onUnauthorized: () => dispatch(logoutUser()),
         });
-        const data = await res.json();
-
-        if (res.status === 401) {
-          dispatch(logoutUser());
-          return;
-        }
-
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to load messages");
-        } else {
-          dispatch(mergeMessages({ conversationId, messages: data }));
-        }
+        dispatch(mergeMessages({ conversationId, messages: data }));
       } catch (error) {
-        if (error.name !== "AbortError") toast.error(error.message);
+        if (error.name !== "AbortError" && error.status !== 401) toast.error(error.message);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }

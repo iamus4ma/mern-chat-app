@@ -12,12 +12,18 @@ const messageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    clientMessageId: { type: String },
     message: {
       type: String,
       required: true,
     },
   },
   { timestamps: true }
+);
+
+messageSchema.index(
+  { senderId: 1, clientMessageId: 1 },
+  { unique: true, partialFilterExpression: { clientMessageId: { $type: "string" } } }
 );
 
 const Message = mongoose.model("Message", messageSchema);

@@ -34,7 +34,7 @@ const MessageContainer = () => {
             </span>
           </div>
           <Messages />
-          <MessageInput />
+          <MessageInput key={selectedConversation._id} />
         </>
       )}
     </div>

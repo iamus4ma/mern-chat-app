@@ -5,31 +5,36 @@ import Login from "./pages/login/Login";
 import SignUp from "./pages/signup/SignUp";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { finishAuthCheck, setUser } from "./redux/features/userSlice";
+import { useEffect, useState } from "react";
+import { logoutUser, setAuthUnavailable, setUser, startAuthCheck } from "./redux/features/userSlice";
+import { apiRequest } from "./utils/apiRequest";
 
 function App() {
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  const authChecked = useSelector((state) => state.user.authChecked);
+  const authStatus = useSelector((state) => state.user.authStatus);
+  const [attempt, setAttempt] = useState(0);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/auth/me", { signal: controller.signal })
-      .then((res) => res.ok ? res.json() : null)
-      .then((user) => {
-        if (user) dispatch(setUser(user));
-      })
+    dispatch(startAuthCheck());
+    apiRequest("/api/auth/me", { signal: controller.signal })
+      .then((user) => dispatch(setUser(user)))
       .catch((error) => {
-        if (error.name !== "AbortError") console.error("Session check failed", error);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) dispatch(finishAuthCheck());
+        if (error.name === "AbortError") return;
+        if (error.status === 401) dispatch(logoutUser());
+        else dispatch(setAuthUnavailable());
       });
     return () => controller.abort();
-  }, [dispatch]);
+  }, [dispatch, attempt]);
 
-  if (!authChecked) return <div className="loading loading-spinner" />;
+  if (authStatus === "checking") return <div className="loading loading-spinner" />;
+  if (authStatus === "unavailable") return (
+    <div role="alert" className="text-center text-white">
+      <p>Cannot reach the server to check your session.</p>
+      <button className="btn mt-3" onClick={() => setAttempt((value) => value + 1)}>Retry</button>
+    </div>
+  );
 
   return (
     <div className="p-4 h-screen flex items-center justify-center">

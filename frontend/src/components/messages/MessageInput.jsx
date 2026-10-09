@@ -4,7 +4,7 @@ import useSendMessage from "../../hooks/useSendMessage";
 
 const MessageInput = () => {
   const { register, handleSubmit, reset } = useForm();
-  const { loading, sendmessage } = useSendMessage();
+  const { loading, error, sendmessage } = useSendMessage();
   const onSubmit = async (data) => {
     if (!data) return;
     if (await sendmessage(data)) reset();
@@ -15,6 +15,7 @@ const MessageInput = () => {
       <div className="w-full relative">
         <input
           type="text"
+          maxLength={5000}
           placeholder="Send a message"
           className="w-full border text-sm rounded-lg block p-2.5 bg-gray-600 text-white"
           {...register("message")}
@@ -31,6 +32,7 @@ const MessageInput = () => {
           )}
         </button>
       </div>
+      {error && <p role="alert" className="mt-2 text-sm text-red-300">{error}</p>}
     </form>
   );
 };

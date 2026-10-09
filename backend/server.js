@@ -16,6 +16,7 @@ dotenv.config({ path: path.join(projectRoot, ".env") });
 
 const PORT = process.env.PORT || 8000;
 
+app.set("trust proxy", 1);
 app.use(express.json()); // to parse the req with JSON payload
 app.use(cookieParser());
 
@@ -33,7 +34,9 @@ app.get("*", (req, res) => {
 //   res.send("Hello World");
 // });
 
-server.listen(PORT, () => {
-  connectToMongoDB();
-  console.log(`Server is running on the port ${PORT}`);
-});
+connectToMongoDB()
+  .then(() => server.listen(PORT, () => console.log(`Server is running on the port ${PORT}`)))
+  .catch((error) => {
+    console.error("Failed to start server:", error.message);
+    process.exitCode = 1;
+  });
