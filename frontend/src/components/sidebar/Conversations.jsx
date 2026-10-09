@@ -1,6 +1,4 @@
-import React from "react";
 import SingleConversation from "./SingleConversation";
-import { getRandomEmoji } from "../../utils/emojis";
 
 const Conversations = ({ loading, conversationsData }) => {
   if (loading) {
@@ -12,7 +10,6 @@ const Conversations = ({ loading, conversationsData }) => {
         <SingleConversation
           key={conversation._id}
           conversation={conversation}
-          emoji={getRandomEmoji()}
           lastIndex={index === conversationsData.length - 1}
         />
       ))}

@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedConversation } from "../../redux/features/conversationSlice";
 import { useSocketContext } from "../../context/SocketContext";
+import { Blobatar } from "@blobatar/react";
 
-const SingleConversation = ({ conversation, emoji, lastIndex }) => {
+const SingleConversation = ({ conversation, lastIndex }) => {
   const dispatch = useDispatch();
   const selectedConversation = useSelector(
     (state) => state?.conversation?.selectedConversation
   );
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
   const { onlineUsers } = useSocketContext();
 	const isOnline = onlineUsers.includes(conversation._id);
 
@@ -26,14 +26,11 @@ const SingleConversation = ({ conversation, emoji, lastIndex }) => {
       >
         <div className={`avatar ${isOnline ? "online" : ""}`}>
           <div className="w-12 rounded-full">
-            <img src={conversation.profilePic} alt="user avatar" />
+            <Blobatar name={conversation.username || conversation._id} size={48} alt={`${conversation.fullName} avatar`} />
           </div>
         </div>
         <div className="flex flex-col flex-1">
-          <div className="flex gap-3 justify-between">
-            <p className="font-bold text-gray-200">{conversation.fullName}</p>
-            <span className="text-xl">{emoji}</span>
-          </div>
+          <p className="font-bold text-gray-200">{conversation.fullName}</p>
         </div>
       </div>
       {!lastIndex && <div className="divider my-0 py-0 h-1" />}

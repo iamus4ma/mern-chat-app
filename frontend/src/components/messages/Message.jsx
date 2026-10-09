@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { extractTime } from "../../utils/extractTime";
+import { Blobatar } from "@blobatar/react";
 
 const Message = ({ message }) => {
   const userMe = useSelector((state) => state.user);
@@ -12,9 +13,7 @@ const Message = ({ message }) => {
   const formattedTime = extractTime(message.createdAt);
   const chatClassName = fromMe ? "chat-end" : "chat-start";
 
-  const profilePic = fromMe
-    ? userMe.profilePic
-    : selectedConversation?.profilePic;
+  const avatarUser = fromMe ? userMe : selectedConversation;
   const bubbleBgColor = fromMe ? "bg-teal-500" : "";
 
   const shakeClass = message.shouldShake ? "shake" : "";
@@ -22,7 +21,7 @@ const Message = ({ message }) => {
     <div className={`chat ${chatClassName}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
-          <img alt="Tailwind CSS chat bubble component" src={profilePic} />
+          <Blobatar name={avatarUser?.username || avatarUser?._id || "user"} size={40} alt={`${avatarUser?.fullName || "User"} avatar`} />
         </div>
       </div>
       <div
